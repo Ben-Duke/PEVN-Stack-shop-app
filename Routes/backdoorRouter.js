@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
+    console.log("/backdoor, endpoint hit")
     const { Pool } = require('pg');
     dbres = ''
     const pool = new Pool({
@@ -12,7 +13,7 @@ router.get("/", async (req, res, next) => {
         port: process.env.PG_PORT,
     })    
         pool.query('SELECT * From product', (err, dbres) => {
-            pool.end()
+            
             res.send(dbres.rows)
         }) 
         
