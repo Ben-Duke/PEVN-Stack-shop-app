@@ -2,19 +2,15 @@ require('dotenv').config()
 const express = require('express');
 const database = require('./Config/database');
 const app = express();
+const bodyParser = require('body-parser');
 const index = require('./Routes/indexRouter');
 const products = require('./Routes/productsRouter');
-const bodyParser = require('body-parser');
-const backdoor = require('./Routes/backdoorRouter');
-
-//Database
-// const { Client } = require('pg')
-// const client = new Client()
+const user = require('./Routes/userRouter');
 
 app.use(bodyParser.json());
 app.use('/', index);
 app.use('/products', products);
-app.use('/backdoor', backdoor);
+app.use('/user', user);
 
 //Handles pages that the server doesnt have and responds with a 404 code
 app.get('*', function(req, res){
