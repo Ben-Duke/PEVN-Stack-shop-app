@@ -7,6 +7,6 @@ router.post('/register', (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-    userController.authUser(req, res);
+    userController.login(req, res);
 })
 module.exports = router;
