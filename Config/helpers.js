@@ -6,4 +6,8 @@ exports.validateString = function (word){
     pattern = new RegExp(/^[A-Za-z]+$/)
     return pattern.test(word);
 }
+exports.validatePhone = function (number){
+    phonePattern = new RegExp(/[0-9]{7,9}/g);
+    return phonePattern.test(number);
+}
 

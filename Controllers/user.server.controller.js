@@ -9,7 +9,7 @@ const helper = require('../Config/helpers');
 
 function validateUserDetails(user_details){
     error_object = []
-    console.log(user_details)
+
     if (!helper.validateString(user_details[0])){
         error_flag = true
         error_object.push({"FirstNameError":"First name "
@@ -20,7 +20,12 @@ function validateUserDetails(user_details){
         error_object.push({"LastNameError":"Last name "
         +"contains non alpha characters"})
     }
-    //Phone check
+    
+    if (!helper.validatePhone(user_details[2])){
+        error_flag = true
+        error_object.push({"PhoneError":"Phone "
+        +"format not correct please check and try again"})
+    }
     if (!helper.vaildateEmail(user_details[3])){
         error_flag = true
         error_object.push({"EmailError":"Email "
@@ -36,11 +41,10 @@ exports.register = function async (req, res) {
     user_values = [];
     user_values.push(user_details['fname']);
     user_values.push(user_details['lname']);
-    user_values.push(user_details['phone']);
+    user_values.push(Number(user_details['phone']));
     user_values.push(user_details['email']);
 
     //Check details first
-    console.log("values " + validateUserDetails(user_values))
     error_object = validateUserDetails(user_values)
     if(error_object.length > 0){
         error_flag = true
