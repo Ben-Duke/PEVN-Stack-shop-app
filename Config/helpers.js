@@ -10,4 +10,11 @@ exports.validatePhone = function (number){
     phonePattern = new RegExp(/[0-9]{7,9}/g);
     return phonePattern.test(number);
 }
-
+exports.validateToken = function (token){
+    tokenPattern = new RegExp(/^[0-9a-zA-Z]+$/);
+    return tokenPattern.test(token);
+}
+exports.validateUserId = function (id){
+    tokenPattern = new RegExp(/^[0-9]+$/);
+    return tokenPattern.test(id);
+}

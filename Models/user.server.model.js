@@ -9,6 +9,7 @@ function runQuery (qs, callback){
                 callback(error);
             }
             else{
+                // console.log(res)
                 callback(res.rows);
             }
             
@@ -30,5 +31,10 @@ exports.login = async function(email,req, res, callback){
 }
 exports.saveToken = async function (token, email, callback){
     qs = "Update public.user set token = '" + token + "' where user_email ='" + email + "';"
+    runQuery(qs,callback);
+}
+exports.clearToken = async function (id, token, callback){
+    qs = "Update public.user set token = '' where token ='" + token  
+    qs += "' and user_id ='" + id +"';"
     runQuery(qs,callback);
 }

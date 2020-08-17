@@ -55,7 +55,8 @@ exports.register = function async (req, res) {
     }
     else{
     //After checking details hash password then attempt to insert user
-    bcrypt.genSalt(saltRounds, function(err, salt) {
+    try {
+        bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(user_details['password'], salt, function(err, hash) {
             // Store hash in your password DB.
             user_values.push(hash)
@@ -70,11 +71,16 @@ exports.register = function async (req, res) {
             });
         });
     });
+    } catch (error) {
+        res.sendStatus(500)
+        res.send(error)
+    }
     }
 }
 
-exports.login =  async function  (req, res){
+exports.login =  async function (req, res){
     userModel.login(req.body['email'],req,res, async (result)=>{
+        user_id=result[0]['user_id'];
         try {
             bcrypt.compare(req.body['password'], result[0]['user_password'], function(err, hashcheck) {  
                 if(hashcheck){
@@ -82,7 +88,8 @@ exports.login =  async function  (req, res){
                     if (err) throw err;
                     userModel.saveToken(token, req.body['email'], (dbres)=>{
                         if(dbres!=[]){
-                            res.json({"token":token});
+                            console.log(dbres)
+                            res.json({"id":user_id, "token":token});
                         }else{
                             res.send("Issue in saveToken")
                         }     
@@ -102,40 +109,35 @@ exports.login =  async function  (req, res){
     
 }
 
-exports.logout =  async function  (req, res){
-    userModel.authUser(req.body['email'],req,res, async (result)=>{
-        try {
-            bcrypt.compare(req.body['password'], result[0]['user_password'], function(err, hashcheck) {  
-                if(hashcheck){
-                    uidgen.generate((err, token) => {
-                    if (err) throw err;
-                    userModel.saveToken('', req.body['email'], (dbres)=>{
-                        if(dbres!=[]){
-                            res.json({'message':"Logged out"});
-                        }else{
-                            res.send("Issue in saveToken")
-                        }     
-                    })
-                  });
-                }
-                else{
-                    res.status(401)
-                    res.json({"error":"Credintails incorrect"})
-                }
-            });
-        } catch (error) {
-            res.sendStatus(500)
-            res.send(error)
-        }
-    });
+exports.logout =  async function (req, res){
+    try {
+        if(helper.validateToken(req.body['token'])){
+            if(helper.validateUserId(req.body['user_id'])){
+                userModel.clearToken(req.body['user_id'], req.body['token'], async function(result){
+                    res.json({"logout":"Successful"})
+                });
+            }else{
+                res.json({"Error":"Id format is wrong"})
+            }
+
+           
+    }
+    else{
+        res.json({"Error":"Token format is wrong"})
+    }
+    } catch (error) {
+        res.sendStatus(500)
+        res.send(error)
+    }
+   
     
 }
+
 exports.checkUser =  async function  (req, res){
     //Check email exists
     userModel.authUser(req.body['email'],req,res, async (result)=>{
         try {
-            
-            
+           pass 
         } catch (error) {
             res.sendStatus(500)
             res.send(error)
