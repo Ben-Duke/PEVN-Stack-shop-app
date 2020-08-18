@@ -61,7 +61,7 @@ exports.register = function async (req, res) {
             // Store hash in your password DB.
             user_values.push(hash)
             userModel.insertUser(user_values,req,res, (results)=>{
-                if(results['error']== "_bt_check_unique"){
+                if(results.rows['error']== "_bt_check_unique"){
                     res.status(401).json({"error":"Email already exists"})
                 }else{
                     res.status(201)
@@ -80,9 +80,9 @@ exports.register = function async (req, res) {
 
 exports.login =  async function (req, res){
     userModel.login(req.body['email'],req,res, async (result)=>{
-        user_id=result[0]['user_id'];
+        user_id=result.rows[0]['user_id'];
         try {
-            bcrypt.compare(req.body['password'], result[0]['user_password'], function(err, hashcheck) {  
+            bcrypt.compare(req.body['password'], result.rows[0]['user_password'], function(err, hashcheck) {  
                 if(hashcheck){
                     uidgen.generate((err, token) => {
                     if (err) throw err;
@@ -118,9 +118,7 @@ exports.logout =  async function (req, res){
                 });
             }else{
                 res.json({"Error":"Id format is wrong"})
-            }
-
-           
+            }   
     }
     else{
         res.json({"Error":"Token format is wrong"})
@@ -133,7 +131,7 @@ exports.logout =  async function (req, res){
     
 }
 
-exports.checkUser =  async function  (req, res){
+exports.checkUser =  async function (req, res){
     //Check email exists
     userModel.authUser(req.body['email'],req,res, async (result)=>{
         try {
@@ -144,4 +142,50 @@ exports.checkUser =  async function  (req, res){
         }
     });
     
+}
+exports.updateUser = async function (req, res){
+
+}
+
+exports.insertAddress = async function (req, res){
+    /*calls a select statement first to check if it exists
+    if it does returns the address id if not inserts it then
+    returns the address id of the new address.
+    */
+    street = req.body['street'].toUpperCase();
+    town = req.body['town'].toUpperCase();
+    postcode = req.body['postcode'].toUpperCase();
+    error_flag = false;
+    errorObject = {}
+    if(!helper.validateStringWithNumbers(street)){
+        error = true;
+        errorObject["StreetError"] ="Street can only contain numbers and letters";
+    }
+    if(!helper.validateString(town)){
+        error = true;
+        errorObject["TownError"]="Town can only contain letters";
+    }
+    if(!helper.validateStringWithNumbers(postcode)){
+        error = true;
+        errorObject["PostcodeError"]="Postcode can only contain numbers and letters";
+    }
+    if(error_flag){
+        res.status(400)
+        res.json(error_object);
+    }
+    else{
+        //Select check first
+        userModel.checkAddress(street, town, postcode, async function(callbackres){
+            if(callbackres.rows[0] != undefined){
+                res.json({"address_id": callbackres.rows[0]['address_id']})
+            }
+            else{
+                //insert as the address does not exist
+                userModel.insertAddress(street, town, postcode, async function(result){
+                    res.json({"address_id": result.rows[0]['address_id']})
+                    })
+            }
+        })
+        
+    }
 }

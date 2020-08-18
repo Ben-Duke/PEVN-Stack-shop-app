@@ -13,4 +13,7 @@ router.post('/login', (req, res) => {
 router.post('/logout', (req, res) => {
     userController.logout(req, res);
 })
+router.post('/newaddress', (req, res) => {
+    userController.insertAddress(req,res);
+})
 module.exports = router;
