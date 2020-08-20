@@ -10,6 +10,10 @@ router.post('/login', (req, res) => {
     userController.login(req, res);
 })
 
+router.put('/updateuser', (req, res)=> {
+    userController.updateUser(req, res);
+})
+
 router.post('/logout', (req, res) => {
     userController.logout(req, res);
 })

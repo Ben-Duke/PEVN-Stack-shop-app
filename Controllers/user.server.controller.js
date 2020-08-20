@@ -31,6 +31,56 @@ function validateUserDetails(user_details){
         error_object.push({"EmailError":"Email "
         +"format not correct please check and try again"})
     }
+    if(user_details.legnth > 4){
+        if(!helper.validateToken(user_details[4])){
+            error_flag = true
+            error_object.push({"TokenError":"Token "
+        +"is not correct please check and try again"})
+        }
+    }
+    
+    return error_object
+}
+function validateUpdateUserDetails(user_details){
+    error_object = []
+    if (!helper.validateUserId(user_details["user_id"])){
+        error_flag = true
+        error_object.push({"UserIdError":"UserId "
+        +"contains non numeric characters"})
+    }
+    if (!helper.validateString(user_details['fname'])){
+        error_flag = true
+        error_object.push({"FirstNameError":"First name "
+        +"contains non alpha characters"})
+    }
+    if (!helper.validateString(user_details['lname'])){
+        error_flag = true
+        error_object.push({"LastNameError":"Last name "
+        +"contains non alpha characters"})
+    }
+    
+    if (!helper.validatePhone(user_details['phone'])){
+        error_flag = true
+        error_object.push({"PhoneError":"Phone "
+        +"format not correct please check and try again"})
+    }
+    if (!helper.vaildateEmail(user_details['email'])){
+        error_flag = true
+        error_object.push({"EmailError":"Email "
+        +"format not correct please check and try again"})
+    }
+    
+    if(!helper.validateToken(user_details['token'])){
+            error_flag = true
+            error_object.push({"TokenError":"Token "
+        +"is not correct please check and try again"})
+    }
+
+    if (!helper.validateUserId(user_details["address_id"])){
+        error_flag = true
+        error_object.push({"AddressIdError":"Address_id "
+        +"contains non numeric characters"})
+    }
     return error_object
 }
 
@@ -144,7 +194,39 @@ exports.checkUser =  async function (req, res){
     
 }
 exports.updateUser = async function (req, res){
-
+    error_flag = false;
+    error_object = []
+    user_details = req.body;
+    user_values = {};
+    user_values["user_id"] = Number(user_details['user_id']);
+    user_values["fname"] = user_details['fname'];
+    user_values["name"] = user_details['lname'];
+    user_values["phone"] = Number(user_details['phone']);
+    user_values["email"] = user_details['email'];
+    user_values["token"] = user_details['token'];
+    user_values["address_id"] = Number(user_details['address_id']);
+    error_object = validateUpdateUserDetails(user_values)
+    if(error_object.length > 0){
+        error_flag = true
+    }
+    if (error_flag) {
+        res.status(401);
+        res.json(error_object);
+    }
+    else {
+        userModel.updateUser(Object.values(user_details), async function(result){
+            console.log(result)
+            if(result['rowCount']==0){
+                res.send("Nothing changed")
+            }
+            else{
+                res.send("Updated user");
+            }
+            
+        });
+        
+        
+    }
 }
 
 exports.insertAddress = async function (req, res){
