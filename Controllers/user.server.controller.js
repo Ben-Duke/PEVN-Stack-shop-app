@@ -271,3 +271,38 @@ exports.insertAddress = async function (req, res){
         
     }
 }
+
+exports.createOrder = async function (req, res){
+    user_id = req.body.user_id
+    user_basket = req.body.basket
+    error_flag = false
+    message = ''
+    userModel.createOrder([user_id], async function(result){
+        order_id = result.rows[0].order_id;
+        for(i = 0; i < user_basket.length; i++ ){
+            values = Object.values(user_basket[i])
+            values.push(order_id)
+            try {
+                userModel.addToOrder(values, function(done){
+                    if(done.error){
+                        console.log("errored")
+                        error_flag = true
+                        message = done.error
+                    }
+                });
+            } catch (error) {
+                error_flag = true
+                message = error
+            }
+              
+        }  
+        if(error_flag){
+            console.log("Error")
+            res.status(400)
+            res.send(message)
+        }else{
+            res.status(201)
+            res.json({"order_id":order_id})
+        }
+    }) 
+}

@@ -20,4 +20,9 @@ router.post('/logout', (req, res) => {
 router.post('/newaddress', (req, res) => {
     userController.insertAddress(req,res);
 })
+
+router.post('/order', (req, res) => {
+    userController.createOrder(req,res);
+})
+
 module.exports = router;
