@@ -2,11 +2,13 @@ require('dotenv').config()
 const express = require('express');
 const database = require('./Config/database');
 const app = express();
+const cors = require('cors')
 const bodyParser = require('body-parser');
 const index = require('./Routes/indexRouter');
 const products = require('./Routes/productsRouter');
 const user = require('./Routes/userRouter');
 
+app.use(cors())
 app.use(bodyParser.json());
 app.use('/', index);
 app.use('/products', products);
