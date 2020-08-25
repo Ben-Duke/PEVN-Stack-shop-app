@@ -273,36 +273,57 @@ exports.insertAddress = async function (req, res){
 }
 
 exports.createOrder = async function (req, res){
-    user_id = req.body.user_id
-    user_basket = req.body.basket
-    error_flag = false
-    message = ''
-    userModel.createOrder([user_id], async function(result){
-        order_id = result.rows[0].order_id;
-        for(i = 0; i < user_basket.length; i++ ){
-            values = Object.values(user_basket[i])
-            values.push(order_id)
-            try {
-                userModel.addToOrder(values, function(done){
-                    if(done.error){
-                        console.log("errored")
-                        error_flag = true
-                        message = done.error
-                    }
-                });
-            } catch (error) {
-                error_flag = true
-                message = error
+    error_flag = false;
+    user_id = req.body.user_id;
+    if(!helper.validateUserId(user_id)){error_flag=true}
+    token = req.body.token;
+    if(!helper.validateToken(token)){error_flag=true}
+    user_basket = req.body.basket;
+    message = '';
+    if(error_flag){
+        res.send("user_id or token is invalid").status(400)
+    }
+    else{
+        userModel.checkUserLoggedIn([user_id,token],async function(checkRes){
+        console.log(checkRes)
+            if (checkRes.rows.length > 0){
+            userModel.createOrder([user_id], async function(result){
+            
+            order_id = result.rows[0].order_id;
+            for(i = 0; i < user_basket.length; i++ ){
+                values = Object.values(user_basket[i])
+                values.push(order_id)
+                try {
+                    userModel.addToOrder(values, function(done){
+                        if(done.error){
+                            console.log("errored")
+                            error_flag = true
+                            message = done.error
+                        }
+                    });
+                } catch (error) {
+                    error_flag = true
+                    message = error
+                }
+                  
+            }  
+            if(error_flag){
+                console.log("Error")
+                res.status(400)
+                res.send(message)
+            }else{
+                res.status(201)
+                res.json({"order_id":order_id})
             }
-              
-        }  
-        if(error_flag){
-            console.log("Error")
-            res.status(400)
-            res.send(message)
-        }else{
-            res.status(201)
-            res.json({"order_id":order_id})
+        })     
         }
-    }) 
+        else{
+            res.send("User is not signed in or has wrong credentials").status(401)
+        }
+        
+        })
+    }
+    
+
+    
 }

@@ -76,7 +76,10 @@ exports.updateUser = async function(values, callback){
     qs += "WHERE user_id=$1 and token = $6 and user_email=$5 RETURNING *;"
     runQueryValues(qs, values, callback);
 }
-
+exports.checkUserLoggedIn = async function(values,callback){
+    qs = "Select * From public.user where user_id = $1 and token = $2"
+    runQueryValues(qs,values,callback);
+}
 exports.createOrder = async function(user_id, callback){
     /*
     INSERT INTO public.customer_orders(
