@@ -2,7 +2,7 @@
 <template>
 
 <div class="home">
-
+  <Navbar></Navbar>
 
   <v-container fluid grid-list-md>
       
@@ -42,15 +42,19 @@
 
 
 <script>
-
+import Navbar from "../components/Navbar";
 
 
 export default {  
+  
   data() {
     return {
     title : "Home",
     products: []
     }
+  },
+  components:{
+    Navbar
   },
   mounted(){
     
