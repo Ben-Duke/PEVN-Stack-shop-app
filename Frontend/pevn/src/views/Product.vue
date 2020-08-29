@@ -1,5 +1,5 @@
 <template>
-  <div class="about">
+  <div class="product">
     <Navbar></Navbar>
     <h1>This is a product page</h1>
     <br>
@@ -25,16 +25,17 @@ export default {
   },
   methods:{
       getProduct: function(){
-          console.log(this.$route.params.id)
-          fetch('http://localhost:3000/products/1')
+        var id = this.$route.params.id;
+          // console.log(this.$route.params.id)
+          fetch('http://localhost:3000/products/'+id)
         .then(response => 
         response.json())
         .then(data => {
-            console.log(data)
+            // console.log(data)
         
             this.product = data[0];
-            console.log("****")
-            console.log(this.product)
+            // console.log("****")
+            // console.log(this.product)
         })
       }
   }

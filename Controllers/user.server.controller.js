@@ -129,33 +129,44 @@ exports.register = function async (req, res) {
 }
 
 exports.login =  async function (req, res){
-    userModel.login(req.body['email'],req,res, async (result)=>{
-        user_id=result.rows[0]['user_id'];
-        try {
-            bcrypt.compare(req.body['password'], result.rows[0]['user_password'], function(err, hashcheck) {  
-                if(hashcheck){
-                    uidgen.generate((err, token) => {
-                    if (err) throw err;
-                    userModel.saveToken(token, req.body['email'], (dbres)=>{
-                        if(dbres!=[]){
-                            console.log(dbres)
-                            res.json({"id":user_id, "token":token});
-                        }else{
-                            res.send("Issue in saveToken")
-                        }     
-                    })
-                  });
-                }
-                else{
-                    res.status(401)
-                    res.json({"error":"Credintails incorrect"})
-                }
-            });
-        } catch (error) {
-            res.sendStatus(500)
-            res.send(error)
-        }
-    });
+    // console.log("Body is ")
+    // console.log(req.body)
+    // console.log("----")
+    if(req.body == {}){
+        res.send("Bad formed request").status(400);
+    }
+    else{
+        userModel.login(req.body['email'],req,res, async (result)=>{
+        
+            try {
+                user_id=result.rows[0]['user_id'];
+                bcrypt.compare(req.body['password'], result.rows[0]['user_password'], function(err, hashcheck) {  
+                    if(hashcheck){
+                        uidgen.generate((err, token) => {
+                        if (err) throw err;
+                        userModel.saveToken(token, req.body['email'], (dbres)=>{
+                            if(dbres!=[]){
+                                console.log(dbres)
+                                res.json({"id":user_id, "token":token});
+                            }else{
+                                res.send("Issue in saveToken")
+                            }     
+                        })
+                      });
+                    }
+                    else{
+                        res.status(401)
+                        res.json({"error":"Credintails incorrect"})
+                    }
+                });
+            } catch (error) {
+                res.sendStatus(500)
+                res.send(error)
+            }
+        });
+    }
+
+    
     
 }
 
