@@ -1,9 +1,6 @@
 <template>
   <div class="Login">
     <Navbar></Navbar>
-    
-
-    
     <v-form align="center"
       ref="form" class="loginForm"
     >
@@ -69,28 +66,39 @@ export default {
         let email = this.email;
         let password = this.password;
         console.log(email + " " + password)
-
-        fetch('http://localhost:3000/user/login',
-        {method: 'post',
-        headers:{
-        "Content-Type": "application/JSON"
-        },
-         body: JSON.stringify(
-             {
-             email:email,
-             password:password
-             })
-             })
-        .then(response => 
-        response.json())
-        .then(data => {
-            console.log(data);
-            sessionStorage.setItem("user_id", data["id"])
-            sessionStorage.setItem("token", data["token"])
-        })
+        if(this.validate()){
+          fetch('http://localhost:3000/user/login',
+          {method: 'post',
+          headers:{
+          "Content-Type": "application/JSON"
+          },
+          body: JSON.stringify(
+              {
+              email:email,
+              password:password
+              })
+              })
+          .then(response => 
+          response.json())
+          .then(data => {
+              console.log(data);
+              sessionStorage.setItem("user_id", data["id"])
+              sessionStorage.setItem("token", data["token"])
+          })
+        }
+        else{
+          console.log("Not valid")
+        }
       },
       validate: function(){
-
+        var valid = true;
+        if(this.email.length < 1){
+          valid = false;
+        }
+        if(this.password.length < 1){
+          valid = false;
+        }
+        return valid;
       }
   }
 }
