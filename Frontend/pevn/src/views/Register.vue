@@ -4,6 +4,7 @@
     <v-form align="center"
       ref="form" class="loginForm"
     >
+      <h1>User Details</h1>
       <v-text-field
         v-model="fname"
         :counter="20"
@@ -26,6 +27,13 @@
         required
       ></v-text-field>
       <v-text-field
+        id="phone"
+        v-model="phone"
+        :rules="phoneRules"
+        label="Phone"
+        required
+      ></v-text-field>
+        <v-text-field
         v-model="password"
         id="password"
         type="password"
@@ -34,10 +42,32 @@
       ></v-text-field>
       <v-text-field
         v-model="confirmPassword"
-        id="password"
+        id="passwordconfirm"
         type="password"
         label="Confirm Password"
-        :rules="passwordRules"
+        required
+      ></v-text-field>
+      <br>
+      <h1>Address</h1>
+      <v-text-field
+        v-model="street"
+        :counter="20"
+        :rules="nameRules"
+        label="Street"
+        required
+      ></v-text-field>
+      <v-text-field
+        v-model="town"
+        :counter="20"
+        :rules="nameRules"
+        label="Town"
+        required
+      ></v-text-field>
+      <v-text-field
+        v-model="postcode"
+        :counter="20"
+        :rules="nameRules"
+        label="Postcode"
         required
       ></v-text-field>
       <v-btn
@@ -69,6 +99,12 @@ export default {
         fname: '',
         lname: '',
         email: '',
+        phone:'',
+        street:'',
+        town:'',
+        postcode:'',
+        password:'',
+        confirmPassword:'',
         emailRules: [
         v => !!v || 'E-mail is required',
         v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
@@ -77,11 +113,13 @@ export default {
         v => !!v || 'Name is required',
         v => (v && v.length <= 20) || 'Name must be less than 20 characters',
       ],
-        password:'',
-        confirmPassword:'',
+        phoneRules: [
+        v => !!v || 'Phone number is required',
+        v => (v && v.isNaN) || 'Name must be less than 20 characters',
+      ],
         passwordRules: [
-        this.confirmPassword != this.password || 'Password doesnt match is required',
-        v => (v && v.length < 6) || 'password much be at least 6',
+        this.passwordcheck() == false || 'Password doesnt match is required',
+        v => (v.length < 6) || 'password much be at least 6',
       ],
         }
     },
@@ -100,17 +138,81 @@ export default {
         if(this.password.length < 1){
           valid = false;
         }
+        if(!this.passwordcheck()){
+          valid = false;
+          this.$refs.form.passwordconfirm.error = "No try again";
+        }
+        if(this.street == ''){
+          valid = false;
+        }
+        if(this.town == ''){
+          valid = false;
+        }
+        if(this.postcode == ''){
+          valid = false;
+        }
         return valid;
       },
-      register: function(){
+      register: async function(){
       //validate 
+      if(this.validate()){
+        console.log("will call register")
+        //insert address first
+         var address_id = await fetch('http://localhost:3000/user/newaddress',
+          {method: 'post',
+          headers:{
+          "Content-Type": "application/JSON"
+          },
+          body: JSON.stringify(
+              {
+              street:this.street,
+              town:this.town,
+              postcode:this.postcode
+              })
+              })
+          .then(response => 
+          response.json())
+          .then(data => {
+              return data.address_id
 
-      //insert address first
+          })
+                 //Create new user
+              fetch('http://localhost:3000/user/register',
+              {method: 'post',
+              headers:{
+              "Content-Type": "application/JSON"
+              },
+                body: JSON.stringify({
+                fname: this.fname,
+                lname: this.lname,  
+                phone: this.phone,  
+                email: this.email,
+                password: this.password,
+                address_id: address_id,
+                })
+                })
+              .then(response => 
+                response.json()
+              
+              ).then(data => {
+              console.log(data)
+              this.$router.push({ name: 'Home' });
+          })
+              
+            }
+          //If successful login them in at the same time
+            
+ 
 
-      //Create new user
-
-      //If successful login them in at the same time
-      console.log("will call register")
+        
+      
+     
+    },
+    passwordcheck: function(){
+      console.log("checked")
+      console.log(this.password)
+      console.log(this.confirmPassword)
+      return this.password == this.confirmPassword
     }
   }
 }

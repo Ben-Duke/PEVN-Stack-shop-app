@@ -93,6 +93,7 @@ exports.register = function async (req, res) {
     user_values.push(user_details['lname']);
     user_values.push(Number(user_details['phone']));
     user_values.push(user_details['email']);
+    user_values.push(Number(user_details['address_id']));
 
     //Check details first
     error_object = validateUserDetails(user_values)
@@ -111,11 +112,19 @@ exports.register = function async (req, res) {
             // Store hash in your password DB.
             user_values.push(hash)
             userModel.insertUser(user_values,req,res, (results)=>{
-                if(results.rows['error']== "_bt_check_unique"){
-                    res.status(401).json({"error":"Email already exists"})
-                }else{
-                    res.status(201)
-                    res.json({"Success":"Account created"});
+                console.log(user_values)
+                try {
+                    console.log(results)
+                    if(results.rows['error']== "_bt_check_unique"){
+                        res.json({"error":"Email already exists"}).status(401)
+                    }else{
+                        res.status(201)
+                        res.json({"Success":"Account created"});
+                    }
+                    
+                } catch (error) {
+                    console.log(error)
+                    res.json({"error":"User already registered with that email"}).status(400)
                 }
                 
             });
@@ -245,9 +254,16 @@ exports.insertAddress = async function (req, res){
     if it does returns the address id if not inserts it then
     returns the address id of the new address.
     */
+   try {
     street = req.body['street'].toUpperCase();
     town = req.body['town'].toUpperCase();
+  
     postcode = req.body['postcode'].toUpperCase();
+    
+   } catch (error) {
+       console.log(error)
+   }
+    
     error_flag = false;
     errorObject = {}
     if(!helper.validateStringWithNumbers(street)){
@@ -275,6 +291,7 @@ exports.insertAddress = async function (req, res){
             else{
                 //insert as the address does not exist
                 userModel.insertAddress(street, town, postcode, async function(result){
+                    console.log(result)
                     res.json({"address_id": result.rows[0]['address_id']})
                     })
             }

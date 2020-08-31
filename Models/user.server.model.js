@@ -9,9 +9,9 @@ function runQuery (qs, callback){
                 callback(error);
             }
             else{
-                // console.log("****************")
-                // console.log(res)
-                // console.log("****************")
+                console.log("****************")
+                console.log(res)
+                console.log("****************")
                 callback(res);
             }
             
@@ -38,11 +38,13 @@ function runQueryValues (qs, values, callback){
 //RETURNING * is used to get the insert id from the request
 //wont return anything otherwise
 exports.insertUser= async function(values,req, res, callback){
+    console.log("______")
+    console.log(values)
+    console.log("______")
     qs = "INSERT INTO public.user("
-    qs = qs + " user_fname, user_lname, user_phone, user_email, user_password)"
-    qs = qs + " VALUES ('" + values[0] + "', '"+ values[1] +"', '"+ values[2]+"','"
-    qs = qs +  values[3] + "','" + values[4] + "') RETURNING *;"
-    runQuery(qs, callback);
+    qs = qs + " user_fname, user_lname, user_phone, user_email, address_id, user_password)"
+    qs = qs + " VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;"
+    runQueryValues(qs,values, callback);
     
 }
 exports.login = async function(email,req, res, callback){
