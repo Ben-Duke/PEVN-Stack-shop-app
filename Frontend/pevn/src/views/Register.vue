@@ -209,9 +209,7 @@ export default {
      
     },
     passwordcheck: function(){
-      console.log("checked")
-      console.log(this.password)
-      console.log(this.confirmPassword)
+      //Checks for the confirm password
       return this.password == this.confirmPassword
     }
   }

@@ -32,8 +32,8 @@
           </v-flex>
           
       </v-layout>
-      <v-btn small >previous 10 products</v-btn>
-      <v-btn small >next 10 products</v-btn>
+      <v-btn v-on:click="offsetMinus" small >previous 10 products</v-btn>
+      <v-btn v-on:click="offsetPlus" small >next 10 products</v-btn>
   </v-container>
 
   </div>
@@ -50,7 +50,8 @@ export default {
   data() {
     return {
     title : "Home",
-    products: []
+    products: [],
+    offset:0
     }
   },
   components:{
@@ -66,16 +67,26 @@ export default {
 
   methods: {
     getProducts: function (){
-      fetch('http://localhost:3000/products')
+      fetch('http://localhost:3000/products?offset='+this.offset)
       .then(response => 
       response.json())
       .then(data => {
-        console.log(data)
-        
         this.products = data.products;
-        console.log(this.products)
         })
+    },
+    offsetPlus: function(){
+      this.offset += 9;
+      this.getProducts()
+      
+    },
+    offsetMinus: function(){
+      this.offset -= 9;
+      if(this.offset < 0){
+        this.offset = 0
+      }
+      this.getProducts()
     }
   }
+    
 };
 </script>
