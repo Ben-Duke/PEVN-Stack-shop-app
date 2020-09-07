@@ -355,3 +355,21 @@ exports.createOrder = async function (req, res){
 
     
 }
+
+exports.getOrders = async function (req, res){
+    error_flag = false;
+    user_id = req.body.user_id;
+    if(!helper.validateUserId(user_id)){error_flag=true}
+    token = req.body.token;
+    if(!helper.validateToken(token)){error_flag=true}
+    message = '';
+    if(error_flag){
+        res.send("user_id or token is invalid").status(400)
+    }
+    else{
+        userModel.myorders([user_id,token],async function(result){
+            console.log(result.rows)
+            res.json(result.rows)
+        })
+    }   
+}

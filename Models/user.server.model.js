@@ -9,9 +9,9 @@ function runQuery (qs, callback){
                 callback(error);
             }
             else{
-                console.log("****************")
-                console.log(res)
-                console.log("****************")
+                // console.log("****************")
+                // console.log(res)
+                // console.log("****************")
                 callback(res);
             }
             
@@ -93,7 +93,6 @@ exports.createOrder = async function(user_id, callback){
   qs += "VALUES ($1, NOW()) RETURNING *;"
   runQueryValues(qs, user_id, callback);
 }
-
 exports.addToOrder = async function(values, callback){
     /*Insert into order_item(order_id, quantity, product_id, item_id)
     Values(1, 1, 1, 1)
@@ -102,5 +101,12 @@ exports.addToOrder = async function(values, callback){
     qs =  "Insert into order_item(order_id, quantity, product_id) "
     qs += "Values($3, $2, $1) "
     qs += "returning *;"
+    runQueryValues(qs, values, callback);
+}
+exports.myorders = async function(values, callback){
+    qs = "SELECT public.customer_orders.user_id, order_id, \"Date\", token "
+	qs += "FROM public.user "
+	qs += "inner join public.customer_orders on public.user.user_id = public.customer_orders.user_id "
+    qs += "where public.customer_orders.user_id = $1 and token = $2;"
     runQueryValues(qs, values, callback);
 }

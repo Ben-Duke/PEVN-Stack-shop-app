@@ -32,6 +32,21 @@ Vue.use(VueRouter)
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue')
+  },
+  {
+    path: '/logout',
+    name: 'Logout',
+    component: () => import('../views/Logout.vue')
+  },
+  {
+    path: '/myorders',
+    name: 'MyOrders',
+    component: () => import('../views/MyOrders.vue')
+  },
+  {
+    path: '/order/:id',
+    name: 'Order',
+    component: () => import('../views/Order.vue')
   }
 ]
 
