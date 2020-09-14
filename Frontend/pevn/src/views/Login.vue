@@ -65,7 +65,7 @@ export default {
         // this.$refs.form.validate();
         let email = this.email;
         let password = this.password;
-        console.log(email + " " + password)
+
         if(this.validate()){
           fetch('http://localhost:3000/user/login',
           {method: 'post',
@@ -81,7 +81,6 @@ export default {
           .then(response => 
           response.json())
           .then(data => {
-              console.log(data);
               sessionStorage.setItem("user_id", data["id"])
               sessionStorage.setItem("token", data["token"])
           })

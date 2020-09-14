@@ -146,31 +146,42 @@ exports.login =  async function (req, res){
     }
     else{
         userModel.login(req.body['email'],req,res, async (result)=>{
-        
-            try {
-                user_id=result.rows[0]['user_id'];
-                bcrypt.compare(req.body['password'], result.rows[0]['user_password'], function(err, hashcheck) {  
-                    if(hashcheck){
-                        uidgen.generate((err, token) => {
-                        if (err) throw err;
-                        userModel.saveToken(token, req.body['email'], (dbres)=>{
-                            if(dbres!=[]){
-                                console.log(dbres)
-                                res.json({"id":user_id, "token":token});
-                            }else{
-                                res.send("Issue in saveToken")
-                            }     
-                        })
-                      });
-                    }
-                    else{
-                        res.status(401)
-                        res.json({"error":"Credintails incorrect"})
-                    }
-                });
-            } catch (error) {
-                res.sendStatus(500)
-                res.send(error)
+            console.log("Result count" + result.rows.length )
+            var account_exists = true;
+            if (result.rows.length < 1){
+                account_exists = false;
+            }
+            if(account_exists){
+                try {
+                    user_id=result.rows[0]['user_id'];
+                    bcrypt.compare(req.body['password'], result.rows[0]['user_password'], function(err, hashcheck) {  
+                        
+                        if(hashcheck && user_id != undefined){
+                            uidgen.generate((err, token) => {
+                            if (err) throw err;
+                            userModel.saveToken(token, req.body['email'], (dbres)=>{
+                                if(dbres!=[]){
+                                    console.log(dbres)
+                                    res.json({"id":user_id, "token":token});
+                                }else{
+                                    res.send("Issue in saveToken")
+                                }     
+                            })
+                          });
+                        }
+                        else{
+                            res.status(401)
+                            res.json({"error":"Credintails incorrect"})
+                        }
+                    });
+                } catch (error) {
+                    console.log(error)
+                    res.sendStatus(500)
+                    res.send(error)
+                }
+            }
+            else{
+                res.json({"Error":"User does not exist"}).status(400);
             }
         });
     }
@@ -372,4 +383,11 @@ exports.getOrders = async function (req, res){
             res.json(result.rows)
         })
     }   
+}
+
+exports.getOrder = async function (req, res){
+    var order_id = req.body.order_id;
+    userModel.orderGetById(order_id, async function(result){
+        res.json(result.rows);
+    })
 }

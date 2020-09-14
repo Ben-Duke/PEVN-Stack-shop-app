@@ -110,3 +110,13 @@ exports.myorders = async function(values, callback){
     qs += "where public.customer_orders.user_id = $1 and token = $2;"
     runQueryValues(qs, values, callback);
 }
+
+exports.orderGetById = async function (order_id, callback){
+    // qs = "SELECT * FROM public.order_item where order_id=$1"
+    qs = "SELECT  order_id, quantity,  public.product.product_id,"
+    qs += " product_name, product_price FROM public.order_item "
+    qs += "join public.product on public.order_item.product_id ="
+    qs += " public.product.product_id "
+	qs += " where order_id = $1"
+    runQueryValues(qs, [order_id], callback);
+}

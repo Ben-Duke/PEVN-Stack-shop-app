@@ -26,8 +26,7 @@ router.post('/order', (req, res) => {
 })
 
 router.post('/orderbyid', (req, res) => {
-    console.log(req);
-    res.json("Did connect")
+    userController.getOrder(req,res);
 })
 
 router.post('/myorders', (req, res) => {
