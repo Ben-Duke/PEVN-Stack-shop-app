@@ -19,7 +19,7 @@
           <span>
             {{ product.product_price }} 
             <span>
-            <v-btn small >Add to basket</v-btn>
+            <v-btn @click="addToBasket(product.product_id)" small >Add to basket</v-btn>
             </span>
           </span>
           
@@ -85,6 +85,55 @@ export default {
         this.offset = 0
       }
       this.getProducts()
+    },
+    addToBasket: function(id){
+      console.log(id);
+      try {
+        var basket = JSON.parse(sessionStorage.getItem("basket"));
+      } catch (error) {
+        basket = []
+      }
+      
+      var addedToBasket = false;
+      if(basket == undefined){
+        basket = []
+      }
+
+      for(var i =0; i < basket.length; i++){
+        if(basket[i].id == id){
+          basket[i].quantity += 1;
+          addedToBasket = true;
+        }
+      }
+      if (!addedToBasket){
+        basket.push({"id":id, "quantity":1})
+      }
+
+      sessionStorage.setItem("basket", JSON.stringify(basket))
+      console.log(JSON.stringify(basket))
+
+
+      // if(this.validate()){
+      //     fetch('http://localhost:3000/user/login',
+      //     {method: 'post',
+      //     headers:{
+      //     "Content-Type": "application/JSON"
+      //     },
+      //     body: JSON.stringify(
+      //         {
+      //         email:email,
+      //         password:password
+      //         })
+      //         })
+      //     .then(response => 
+      //     response.json())
+      //     .then(data => {
+      //         console.log()
+      //     })
+      //   }
+      //   else{
+      //     console.log("Not valid")
+      //   }
     }
   }
     
