@@ -54,6 +54,7 @@ export default {
               console.log(data);
               sessionStorage.removeItem('user_id');
               sessionStorage.removeItem('token');
+              sessionStorage.removeItem('basket');
           })
         }
       },
