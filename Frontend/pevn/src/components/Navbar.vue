@@ -25,7 +25,7 @@
                 </ul> 
                 <p v-else>Basket is empty</p>
                 
-            <v-btn>Check out</v-btn> 
+            <v-btn @click="$router.push('/checkout')">Check out</v-btn> 
             <v-btn @click="modal = false;">Close</v-btn>
             </v-card>
         </v-dialog>
@@ -75,15 +75,6 @@
             saveBasket: function(){
                 sessionStorage.setItem("basket", JSON.stringify(this.basket))
             },
-            getItemName: function(id){
-                fetch('http://localhost:3000/products'+id)
-                .then(response => 
-                response.json())
-                .then(data => {
-                console.log(data.product_name)
-                return data.product_name;
-        })
-            }
         }
     }
     

@@ -19,7 +19,7 @@
           <span>
             {{ product.product_price }} 
             <span>
-            <v-btn @click="addToBasket(product.product_id, product.product_name)" small >Add to basket</v-btn>
+            <v-btn @click="addToBasket(product.product_id, product.product_name, product.product_price)" small >Add to basket</v-btn>
             </span>
           </span>
           
@@ -86,7 +86,7 @@ export default {
       }
       this.getProducts()
     },
-    addToBasket: function(id, name){
+    addToBasket: function(id, name, price){
       console.log(id);
       try {
         var basket = JSON.parse(sessionStorage.getItem("basket"));
@@ -106,7 +106,7 @@ export default {
         }
       }
       if (!addedToBasket){
-        basket.push({"id":id, "name":name, "quantity":1})
+        basket.push({"id":id, "name":name, "quantity":1, "price":price })
       }
 
       sessionStorage.setItem("basket", JSON.stringify(basket))
