@@ -29,7 +29,6 @@ export default {
   },
   created: function (){
       this.getOrders();
-      console.log(this.orders)
   },
   methods:{
       getOrders: function(){
@@ -53,9 +52,9 @@ export default {
         .then(response => 
         response.json())
         .then(data => {
-            console.log(data)
+            
             this.orders= data
-            console.log(this.orders)
+            
         })
         }
         

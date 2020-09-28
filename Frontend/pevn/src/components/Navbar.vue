@@ -2,12 +2,9 @@
     <div>
         <div id="nav" data-app>
             <router-link to="/">Home</router-link> |
-            <router-link to="/about">About</router-link> |
-            <router-link to="/product">Product</router-link> |
             <router-link to="/login">Login</router-link> |
             <router-link to="/register">Register</router-link> |
             <router-link to="/logout">Logout</router-link> |
-            <router-link to="/order">order</router-link> |
             <router-link to="/myorders">My orders</router-link>
             <router-view/>
             <v-btn @click='openCheckout()'>🛒</v-btn>
@@ -29,7 +26,7 @@
             <v-btn @click="modal = false;">Close</v-btn>
             </v-card>
         </v-dialog>
-         
+            <p v-if="loggedin">Hi {{this.name}}</p>
         </div>
         
     </div>
@@ -39,10 +36,23 @@
         data(){
             return {
                 modal:false,
-                basket:[]
+                basket:[],
+                name : "",
+                loggedin: false
             }
         },
-        name: 'todoTask',
+        created(){
+            var name = sessionStorage.getItem("user_fname");
+            var token = sessionStorage.getItem("token");
+            if(name != undefined && token != undefined){
+                this.name = name;
+                this.loggedin = true;
+            }
+            else{
+                this.name = "";
+                this.loggedin = false;
+            }
+        },
         methods: {
             openCheckout: function (){
                 console.log("Open Cart")

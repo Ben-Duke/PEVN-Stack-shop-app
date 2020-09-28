@@ -81,8 +81,10 @@ export default {
           .then(response => 
           response.json())
           .then(data => {
+              sessionStorage.setItem("user_fname", data["fname"])
               sessionStorage.setItem("user_id", data["id"])
               sessionStorage.setItem("token", data["token"])
+              this.$router.push('/');
           })
         }
         else{

@@ -53,6 +53,7 @@ export default {
               console.log("called")
               console.log(data);
               sessionStorage.removeItem('user_id');
+              sessionStorage.removeItem('user_fname');
               sessionStorage.removeItem('token');
               sessionStorage.removeItem('basket');
           })

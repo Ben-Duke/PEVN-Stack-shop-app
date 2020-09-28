@@ -51,7 +51,7 @@ export default {
     return {
     title : "Home",
     products: [],
-    offset:0
+    offset:0,
     }
   },
   components:{
@@ -87,7 +87,6 @@ export default {
       this.getProducts()
     },
     addToBasket: function(id, name, price){
-      console.log(id);
       try {
         var basket = JSON.parse(sessionStorage.getItem("basket"));
       } catch (error) {
@@ -110,7 +109,6 @@ export default {
       }
 
       sessionStorage.setItem("basket", JSON.stringify(basket))
-      console.log(JSON.stringify(basket))
 
 
     }

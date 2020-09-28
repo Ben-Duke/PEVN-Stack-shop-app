@@ -79,7 +79,7 @@ export default {
         var total = 0.00;
         console.log(this.order_products.length);
         for(var i = 0; i < this.order_products.length; i++){
-          total += parseFloat(this.order_products[i].product_price);
+          total += parseFloat(this.order_products[i].product_price) * this.order_products[i].quantity;
         }
         this.total = total.toFixed(2);
       }

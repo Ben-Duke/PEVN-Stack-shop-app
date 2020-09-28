@@ -156,7 +156,6 @@ export default {
       register: async function(){
       //validate 
       if(this.validate()){
-        console.log("will call register")
         //insert address first
          var address_id = await fetch('http://localhost:3000/user/newaddress',
           {method: 'post',
@@ -191,22 +190,32 @@ export default {
                 address_id: address_id,
                 })
                 })
-              .then(response => 
-                response.json()
-              
-              ).then(data => {
-              console.log(data)
-              this.$router.push({ name: 'Home' });
-          })
+              .then(response => {
+                 response.json()
+                 fetch('http://localhost:3000/user/login',
+                  {method: 'post',
+                  headers:{
+                  "Content-Type": "application/JSON"
+                  },
+                  body: JSON.stringify(
+                      {
+                      email:this.email,
+                      password:this.password
+                      })
+                      })
+                  .then(response => 
+                  response.json())
+                  .then(data => {
+                    
+                      sessionStorage.setItem("user_fname", data["fname"])
+                      sessionStorage.setItem("user_id", data["id"])
+                      sessionStorage.setItem("token", data["token"])
+                      this.$router.push('/');
+                  })
+              })
               
             }
-          //If successful login them in at the same time
-            
- 
-
         
-      
-     
     },
     passwordcheck: function(){
       //Checks for the confirm password

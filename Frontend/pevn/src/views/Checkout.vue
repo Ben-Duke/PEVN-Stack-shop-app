@@ -139,13 +139,13 @@ export default {
               basket: basketJson
               })
               })
-          .then(response => 
-          response.json())
-          .then(data => {
-              console.log(data)
-              this.basket = [];
-              this.saveBasket();
-          })
+          .then(response => {
+            response.json();
+            this.basket = [];
+            this.saveBasket();
+            this.$router.push('/myorders');
+          }
+          )
         }
         else{
           console.log("Not valid")

@@ -119,7 +119,7 @@ exports.register = function async (req, res) {
                         res.json({"error":"Email already exists"}).status(401)
                     }else{
                         res.status(201)
-                        res.json({"Success":"Account created"});
+                        res.json({"id":results.rows[0].user_id});
                     }
                     
                 } catch (error) {
@@ -161,8 +161,10 @@ exports.login =  async function (req, res){
                             if (err) throw err;
                             userModel.saveToken(token, req.body['email'], (dbres)=>{
                                 if(dbres!=[]){
-                                    console.log(dbres)
-                                    res.json({"id":user_id, "token":token});
+                                    // console.log("******")
+                                    // console.log(dbres)
+                                    // console.log("******")
+                                    res.json({"id":user_id,"fname": dbres.rows[0].user_fname, "token":token });
                                 }else{
                                     res.send("Issue in saveToken")
                                 }     
