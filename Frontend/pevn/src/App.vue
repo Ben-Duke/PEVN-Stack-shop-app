@@ -17,7 +17,18 @@
   text-align: center;
   color: #2c3e50;
 }
+.logo{
+  float:left
+}
 
+.accountItems{
+  float: right
+}
+.navbar {
+  top:20px;
+  background-color:#FFFDD0;
+  height: 150px;
+}
 #nav {
   padding: 30px;
 

@@ -16,7 +16,6 @@
   <v-data-table :headers="headers" :items="basket">
       <template v-slot:item="row">
           <tr>
-            <td>{{row.item.id}}</td>
             <td>{{row.item.name}}</td>
             <td>
               <v-btn class="mx-2" fab white small color="pink" @click="minus(row.item.id)">
@@ -36,7 +35,9 @@
           </tr>
       </template>
     </v-data-table>
-    <v-btn @click="processOrder()">Confirm order</v-btn>
+    <p>${{this.total.toFixed(2)}}</p>
+    <v-btn v-if="loggedin" @click="processOrder()">Confirm order</v-btn>
+    <p v-else>Need to be logged in to complete transaction</p>
   </div>
   
 </template>
@@ -61,15 +62,29 @@ export default {
           { text: 'Amount', value: 'quantity' },
           { text: 'Price', value: 'price' },
           ],
-          basket: []
+          basket: [],
+          loggedin: false,
+          total:0.00
         }
     },
   components:{
     Navbar
   },
   created: function (){
-     this.getBasket()
-
+    this.getBasket()
+    
+    var name = sessionStorage.getItem("user_fname");
+    var token = sessionStorage.getItem("token");
+    if(name != undefined && token != undefined){
+        this.name = name;
+        this.loggedin = true;
+    }
+    else{
+        this.name = "";
+        this.loggedin = false;
+    }
+    this.updateTotal();
+        
   },
   methods:{
       getBasket: function (){
@@ -100,6 +115,7 @@ export default {
             },
       saveBasket: function(){
           sessionStorage.setItem("basket", JSON.stringify(this.basket))
+          this.updateTotal();
       },
       minus: function (id){
         for(var i = 0; i < this.basket.length; i++){
@@ -110,6 +126,7 @@ export default {
                 }  
             }
           }
+          
       },
       plus: function (id){
         for(var i = 0; i < this.basket.length; i++){
@@ -118,6 +135,7 @@ export default {
                 this.saveBasket(); 
             }
           }
+          
       },
       processOrder: async function(){
 
@@ -151,6 +169,12 @@ export default {
           console.log("Not valid")
         }
       },
-  }
+      updateTotal: function(){
+        this.total = 0;
+        for(var i =0; i < this.basket.length; i++){
+          this.total += this.basket[i].price * this.basket[i].quantity
+        }
+      }
+      }
 }
 </script>>
