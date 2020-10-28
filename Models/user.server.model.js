@@ -38,11 +38,13 @@ function runQueryValues (qs, values, callback){
 //RETURNING * is used to get the insert id from the request
 //wont return anything otherwise
 exports.insertUser= async function(values,req, res, callback){
+    console.log("______")
+    console.log(values)
+    console.log("______")
     qs = "INSERT INTO public.user("
-    qs = qs + " user_fname, user_lname, user_phone, user_email, user_password)"
-    qs = qs + " VALUES ('" + values[0] + "', '"+ values[1] +"', '"+ values[2]+"','"
-    qs = qs +  values[3] + "','" + values[4] + "') RETURNING *;"
-    runQuery(qs, callback);
+    qs = qs + " user_fname, user_lname, user_phone, user_email, address_id, user_password)"
+    qs = qs + " VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;"
+    runQueryValues(qs,values, callback);
     
 }
 exports.login = async function(email,req, res, callback){
@@ -91,7 +93,6 @@ exports.createOrder = async function(user_id, callback){
   qs += "VALUES ($1, NOW()) RETURNING *;"
   runQueryValues(qs, user_id, callback);
 }
-
 exports.addToOrder = async function(values, callback){
     /*Insert into order_item(order_id, quantity, product_id, item_id)
     Values(1, 1, 1, 1)
@@ -101,4 +102,21 @@ exports.addToOrder = async function(values, callback){
     qs += "Values($3, $2, $1) "
     qs += "returning *;"
     runQueryValues(qs, values, callback);
+}
+exports.myorders = async function(values, callback){
+    qs = "SELECT public.customer_orders.user_id, order_id, \"Date\", token "
+	qs += "FROM public.user "
+	qs += "inner join public.customer_orders on public.user.user_id = public.customer_orders.user_id "
+    qs += "where public.customer_orders.user_id = $1 and token = $2;"
+    runQueryValues(qs, values, callback);
+}
+
+exports.orderGetById = async function (order_id, callback){
+    // qs = "SELECT * FROM public.order_item where order_id=$1"
+    qs = "SELECT  order_id, quantity,  public.product.product_id,"
+    qs += " product_name, product_price FROM public.order_item "
+    qs += "join public.product on public.order_item.product_id ="
+    qs += " public.product.product_id "
+	qs += " where order_id = $1"
+    runQueryValues(qs, [order_id], callback);
 }

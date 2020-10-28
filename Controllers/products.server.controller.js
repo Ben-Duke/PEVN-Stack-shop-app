@@ -20,7 +20,13 @@ exports.getProduct = async function(id, req ,res){
 }
 
 exports.getProducts = async function(req, res){
-    productModel.getProducts(function(result){
+    var offset = req.query.offset;
+    console.log(offset)
+    if (offset == undefined){
+        offset = 0;
+    }
+    
+    productModel.getProductsPaged(offset ,function(result){
         products = {
             "products": []
         }

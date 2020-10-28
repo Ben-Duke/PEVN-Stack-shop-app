@@ -14,6 +14,19 @@ exports.getProducts= async function (callback){
     })
 }
 
+exports.getProductsPaged= async function (offset, callback){
+    pool = database.getPool();
+    pool.query('SELECT * From product OFFSET ' + offset + 'LIMIT 9;', (err, res) => {
+        if(err != undefined){
+            error = {'error':err.routine}
+            callback(error);
+        }
+        else{
+            callback(res.rows);
+        }
+        
+    })
+}
 exports.getProduct = async function (productId,callback){
     pool = database.getPool();
     pool.query('SELECT * From product where product_id = ' + productId, (err, res) => {

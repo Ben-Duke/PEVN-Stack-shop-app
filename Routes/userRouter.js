@@ -25,4 +25,12 @@ router.post('/order', (req, res) => {
     userController.createOrder(req,res);
 })
 
+router.post('/orderbyid', (req, res) => {
+    userController.getOrder(req,res);
+})
+
+router.post('/myorders', (req, res) => {
+    userController.getOrders(req, res);
+})
+
 module.exports = router;

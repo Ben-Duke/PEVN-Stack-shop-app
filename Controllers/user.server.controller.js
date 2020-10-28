@@ -93,6 +93,7 @@ exports.register = function async (req, res) {
     user_values.push(user_details['lname']);
     user_values.push(Number(user_details['phone']));
     user_values.push(user_details['email']);
+    user_values.push(Number(user_details['address_id']));
 
     //Check details first
     error_object = validateUserDetails(user_values)
@@ -111,11 +112,19 @@ exports.register = function async (req, res) {
             // Store hash in your password DB.
             user_values.push(hash)
             userModel.insertUser(user_values,req,res, (results)=>{
-                if(results.rows['error']== "_bt_check_unique"){
-                    res.status(401).json({"error":"Email already exists"})
-                }else{
-                    res.status(201)
-                    res.json({"Success":"Account created"});
+                console.log(user_values)
+                try {
+                    console.log(results)
+                    if(results.rows['error']== "_bt_check_unique"){
+                        res.json({"error":"Email already exists"}).status(401)
+                    }else{
+                        res.status(201)
+                        res.json({"id":results.rows[0].user_id});
+                    }
+                    
+                } catch (error) {
+                    console.log(error)
+                    res.json({"error":"User already registered with that email"}).status(400)
                 }
                 
             });
@@ -129,33 +138,57 @@ exports.register = function async (req, res) {
 }
 
 exports.login =  async function (req, res){
-    userModel.login(req.body['email'],req,res, async (result)=>{
-        user_id=result.rows[0]['user_id'];
-        try {
-            bcrypt.compare(req.body['password'], result.rows[0]['user_password'], function(err, hashcheck) {  
-                if(hashcheck){
-                    uidgen.generate((err, token) => {
-                    if (err) throw err;
-                    userModel.saveToken(token, req.body['email'], (dbres)=>{
-                        if(dbres!=[]){
-                            console.log(dbres)
-                            res.json({"id":user_id, "token":token});
-                        }else{
-                            res.send("Issue in saveToken")
-                        }     
-                    })
-                  });
+    // console.log("Body is ")
+    // console.log(req.body)
+    // console.log("----")
+    if(req.body == {}){
+        res.send("Bad formed request").status(400);
+    }
+    else{
+        userModel.login(req.body['email'],req,res, async (result)=>{
+            console.log("Result count" + result.rows.length )
+            var account_exists = true;
+            if (result.rows.length < 1){
+                account_exists = false;
+            }
+            if(account_exists){
+                try {
+                    user_id=result.rows[0]['user_id'];
+                    bcrypt.compare(req.body['password'], result.rows[0]['user_password'], function(err, hashcheck) {  
+                        
+                        if(hashcheck && user_id != undefined){
+                            uidgen.generate((err, token) => {
+                            if (err) throw err;
+                            userModel.saveToken(token, req.body['email'], (dbres)=>{
+                                if(dbres!=[]){
+                                    // console.log("******")
+                                    // console.log(dbres)
+                                    // console.log("******")
+                                    res.json({"id":user_id,"fname": dbres.rows[0].user_fname, "token":token });
+                                }else{
+                                    res.send("Issue in saveToken")
+                                }     
+                            })
+                          });
+                        }
+                        else{
+                            res.status(401)
+                            res.json({"error":"Credintails incorrect"})
+                        }
+                    });
+                } catch (error) {
+                    console.log(error)
+                    res.sendStatus(500)
+                    res.send(error)
                 }
-                else{
-                    res.status(401)
-                    res.json({"error":"Credintails incorrect"})
-                }
-            });
-        } catch (error) {
-            res.sendStatus(500)
-            res.send(error)
-        }
-    });
+            }
+            else{
+                res.json({"Error":"User does not exist"}).status(400);
+            }
+        });
+    }
+
+    
     
 }
 
@@ -234,9 +267,16 @@ exports.insertAddress = async function (req, res){
     if it does returns the address id if not inserts it then
     returns the address id of the new address.
     */
+   try {
     street = req.body['street'].toUpperCase();
     town = req.body['town'].toUpperCase();
+  
     postcode = req.body['postcode'].toUpperCase();
+    
+   } catch (error) {
+       console.log(error)
+   }
+    
     error_flag = false;
     errorObject = {}
     if(!helper.validateStringWithNumbers(street)){
@@ -264,6 +304,7 @@ exports.insertAddress = async function (req, res){
             else{
                 //insert as the address does not exist
                 userModel.insertAddress(street, town, postcode, async function(result){
+                    console.log(result)
                     res.json({"address_id": result.rows[0]['address_id']})
                     })
             }
@@ -326,4 +367,29 @@ exports.createOrder = async function (req, res){
     
 
     
+}
+
+exports.getOrders = async function (req, res){
+    error_flag = false;
+    user_id = req.body.user_id;
+    if(!helper.validateUserId(user_id)){error_flag=true}
+    token = req.body.token;
+    if(!helper.validateToken(token)){error_flag=true}
+    message = '';
+    if(error_flag){
+        res.send("user_id or token is invalid").status(400)
+    }
+    else{
+        userModel.myorders([user_id,token],async function(result){
+            console.log(result.rows)
+            res.json(result.rows)
+        })
+    }   
+}
+
+exports.getOrder = async function (req, res){
+    var order_id = req.body.order_id;
+    userModel.orderGetById(order_id, async function(result){
+        res.json(result.rows);
+    })
 }
