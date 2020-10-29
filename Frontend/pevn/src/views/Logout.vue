@@ -29,11 +29,13 @@ export default {
         
         let user_id = sessionStorage['user_id'];
         let token = sessionStorage['token'];
-        console.log(user_id + " " + token)
+        var router = this.$router
+        
         if(user_id == undefined || token == undefined){
             //dont send request as may not be the right user
           sessionStorage.removeItem('user_id');
           sessionStorage.removeItem('token');
+          setTimeout(function(){ router.push('/');}, 2000);
         }
         else{
           fetch('http://localhost:3000/user/logout',
@@ -47,16 +49,16 @@ export default {
               token:token
               })
               })
-          .then(response => 
-          response.json())
-          .then(data => {
-              console.log("called")
-              console.log(data);
+          .then(async () => {
               sessionStorage.removeItem('user_id');
               sessionStorage.removeItem('user_fname');
               sessionStorage.removeItem('token');
               sessionStorage.removeItem('basket');
-          })
+              
+              setTimeout(function(){ router.push('/');}, 2000);
+            }
+          )
+          
         }
       },
       

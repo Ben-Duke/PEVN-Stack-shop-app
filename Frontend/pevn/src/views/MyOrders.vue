@@ -8,7 +8,8 @@
         <li v-for="order in orders" :key="order.order_id">
         Order Number: <router-link :to=" {path: 'Order/' + order.order_id}">{{order.order_id }}</router-link> 
         |
-        {{order.Date}}
+        
+        {{new Date(order.Date).toLocaleString().split(',')[0]}}
   </li>
 </ul>
     
